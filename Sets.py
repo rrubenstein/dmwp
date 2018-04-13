@@ -60,8 +60,20 @@ class Card:
 
 def make_deck():
     deck = {}
+    counter = 1
     suits = ['Spades', 'Clubs', 'Hearts', 'Diamonds']
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     for suit in range(0, 4):
         for rank in range(0, 13):
-            Card(suits[suit], ranks[rank])
+            deck[counter] = Card(suits[suit], ranks[rank])
+            counter += 1
+    return deck
+
+def shuffle():
+    ids = []
+    for x in range(1, 53):
+        ids.append(x)
+    random.shuffle(ids)
+    deck = make_deck()
+    for x in ids:
+        print('{0} of {1}'.format(deck[x].rank, deck[x].suit))
