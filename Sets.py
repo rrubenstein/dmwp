@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from sympy import FiniteSet
 import random
 import time
+import math
 
 def draw_venn(sets):
 
@@ -77,3 +78,47 @@ def shuffle():
     deck = make_deck()
     for x in ids:
         print('{0} of {1}'.format(deck[x].rank, deck[x].suit))
+
+def dart_test(r):
+    area_s = float((2*r)**2)
+    area_c = float(math.pi*r**2)
+    center = (r, r)
+    b = 2*r
+    n = 0.0
+    for i in range(0, 1000):
+        x = random.uniform(0, b)
+        y = random.uniform(0, b)
+        p = (x, y)
+        d = math.sqrt((p[0]-center[0])**2 + (p[1]-center[1])**2)
+        if d <= r:
+            n += 1.0
+    t1 = float((n/1000.0)*area_s)
+    n = 0.0
+    for i in range(0, 100000):
+        x = random.uniform(0, b)
+        y = random.uniform(0, b)
+        p = (x, y)
+        d = math.sqrt((p[0]-center[0])**2 + (p[1]-center[1])**2)
+        if d <= r:
+            n += 1.0
+    t2 = float((n/100000.0)*area_s)
+    n = 0.0
+    for i in range(0, 1000000):
+        x = random.uniform(0, b)
+        y = random.uniform(0, b)
+        p = (x, y)
+        d = math.sqrt((p[0]-center[0])**2 + (p[1]-center[1])**2)
+        if d <= r:
+            n+=1.0
+    t3 = float((n/1000000.0)*area_s)
+
+    print('Area : {0}, Estimated ({1}): {2}'.format(area_c, '1000', t1))
+    print('Area : {0}, Estimated ({1}): {2}'.format(area_c, '100000', t2))
+    print('Area : {0}, Estimated ({1}): {2}'.format(area_c, '1000000', t3))
+
+r = raw_input('Radius: ')
+try:
+    r = int(r)
+    dart_test(r)
+except ValueError:
+    print('oops')
