@@ -1,8 +1,9 @@
 from matplotlib import pyplot as plt
 from matplotlib import animation
-from matplotlib import cm as cm 
+from matplotlib import cm as cm
 import math
 import random
+import cmath
 
 def create_circle(r):
     if r == None:
@@ -155,4 +156,36 @@ def hen():
     plt.plot(x, y, 'o')
     plt.xlabel('X')
     plt.ylabel('Y')
+    plt.show()
+
+def init_image(x_p, y_p):
+    image = []
+    for i in range(y_p):
+        x_colors = []
+        for j in range(x_p):
+            x_colors.append(0)
+        image.append(x_colors)
+    return image
+
+def color_points(x0, y0, x1, y1, p):
+    x_p = p
+    y_p = p
+    max_iteration = 1000
+    image = init_image(x_p, y_p)
+    dx = float(x1 - x0)/float(p-1)
+    dy = float(y1 - y0)/float(p-1)
+    x_coords = [x0 + i*dx for i in range(p)]
+    y_coords = [y0 + i*dy for i in range(p)]
+    for i, x in enumerate(x_coords):
+        for k, y in enumerate(y_coords):
+            z1 = complex(0, 0)
+            iteration = 0
+            c = complex(x, y)
+            while abs(z1) < 2 and iteration < max_iteration:
+                z1 = z1**2 + c
+                iteration += 1
+            image[k][i]= iteration
+    plt.imshow(image, origin='lower', extent=(x0, x1, y0, y1),
+    cmap=cm.Greys_r, interpolation='nearest')
+    plt.colorbar()
     plt.show()
