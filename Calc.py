@@ -85,3 +85,22 @@ def area_bet_curve():
     fx2 = intergal_of_curve(f2, var, a, b)
     area = fx1 - fx2
     print('The area between the functions {0} and {1} between {2} and {3} is {4}'.format(f1, f2, a, b, area))
+
+def len_of_arc(f, var, start, finish):
+    var = Symbol(var)
+    d = Derivative(f, var).doit().evalf()
+    f1 = (1 + (d)**2)**0.5
+    integ = Integral(f1, (var, start, finish)).doit().evalf()
+    return integ
+
+def find_length_arc():
+    f = raw_input('Enter the function: ')
+    var = raw_input('Enter the variable: ')
+    a = float(raw_input('Enter the starting point: '))
+    b = float(raw_input('Enter the ending point: '))
+    f = sympify(f)
+    c = len_of_arc(f, var, a, b)
+    c = sympify(c)
+    print('The length of {0} between {1} and {2} is {3}'.format(f, a, b, c))
+
+find_length_arc()
