@@ -13,6 +13,43 @@ canvas = Canvas(tk, width=610, height=610)
 canvas.pack()
 tk.update()
 
+class Room(object):
+    def __init__(self, top, bottom, left, right, monster, player, treasure x, y):
+        self.top = top
+        self.bottom = bottom
+        self.left = left
+        self.right = right
+        self.monster = monster
+        self.player = player
+        self.treasure = treasure
+        self.x = x
+        self.y = y
+
+    def test(self):
+        result = {"top":0, "bottom":0, "left":0, "right":0}
+
+        if self.top == True:
+            result["top"] = True
+        else:
+            result["top"] = False
+
+        if self.bottom == True:
+            result["bottom"] = True
+        else:
+            result["bottom"] = False
+
+        if self.left == True:
+            result["left"] = True
+        else:
+            result["left"] = False
+
+        if self.right == True:
+            result["right"] = True
+        else:
+            result["right"] = False
+
+        return result
+
 def draw_room(rn, x1, y1):
     if rn == 1:
         x1 += 10
@@ -187,12 +224,174 @@ def draw_room(rn, x1, y1):
         canvas.create_line(x2, y3, x3, y3)
     else:
         print("oops")
-count = 1
-while count < 15:
-    for y in range(10, 600, 60):
-        for x in range(10, 600, 60):
-            draw_room(count, x, y)
-            count += 1
-            canvas.pack()
-            tk.update()
-            time.sleep(2)
+
+frame_room = Room(False, False, False, False, False, False, False, 0, 0)
+rooms = Room(True, True, True, True, False, False, False, 0, 0)
+def make_map():
+    map_frame = [
+    [[frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [rooms], [rooms], [rooms], [rooms], [rooms], [rooms], [frame_room]],
+    [[frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room], [frame_room]]
+    ]
+
+    for y in range(len(map_frame)):
+        for x in range(len(map_frame[y])):
+            if map_frame[y - 1][x].bottom == False:
+                if map_frame[y][x - 1].right == False:
+                    if map_frame[y][x + 1].left == False:
+                        if map_frame[y + 1][x].top == False:
+                            print("no connections")
+                            map_frame[y][x] = Room(False, False, False, False, False, False, False, x, y)
+                        else:
+                            ynb = 0.01 * float(random.randint(1, 100))
+                            if ynb <= 0.85:
+                                map_frame[y][x] = Room(False, True, False, False, False, False, False, x, y)
+                                print("one connection: down")
+                            else:
+                                map_frame[y][x] = Room(False, False, False, False, False, False, False, x, y)
+                                print("no connections (tried down)")
+                    else:
+                        ynr = 0.01 * float(random.randint(1, 100))
+                        if map_frame[y + 1][x].top == False:
+                            if ynr <= 0.85:
+                                map_frame[y][x] = Room(False, False, False, True, False, False, False, x, y)
+                                print("one connection: right")
+                            else:
+                                map_frame[y][x] = Room(False, False, False, False, False, False, False, x, y)
+                                print("No connections (tried right)")
+                        else:
+                            ynd = 0.01 * float(random.randint(1, 100))
+                            if ynr <= 0.85:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(False, True, False, True, False, False, False, a, b)
+                                    print("two connections: bottom, right")
+                                else:
+                                    map_frame[y][x] = Room(False, False, False, True, False, False, False, x, y)
+                                    print("one connection: right (tried bottom)")
+                            else:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(False, True, False, False, False, False, False, x, y)
+                                    print("one connection: bottom (tried right)")
+                                else:
+                                    map_frame[y][x] = Room(False, False, False, False, False, False, False, x, y)
+                                    print("no connections (tried bottom, right)")
+                else:
+                    if map_frame[y][x + 1].left == False:
+                        if map_frame[y + 1][x].top == False:
+                            map_frame[y][x] = Room(False, False, True, False, False, False, False, x, y)
+                            print("one connection: left")
+                        else:
+                            ynb = 0.01 * float(random.randint(1, 100))
+                            if ynb <= 0.85:
+                                map_frame[y][x] = Room(False, True, True, False, False, False, False, x, y)
+                                print("two connection: down, left")
+                            else:
+                                map_frame[y][x] = Room(False, False, True, False, False, False, False, x, y)
+                                print("one connection: left (tried down)")
+                    else:
+                        ynr = 0.01 * float(random.randint(1, 100))
+                        if map_frame[y + 1][x].top == False:
+                            if ynr <= 0.85:
+                                map_frame[y][x] = Room(False, False, True, True, False, False, False, x, y)
+                                print("two connection: left, right")
+                            else:
+                                map_frame[y][x] = Room(False, False, True, False, False, False, False, x, y)
+                                print("one connection: left (tried right)")
+                        else:
+                            ynd = 0.01 * float(random.randint(1, 100))
+                            if ynr <= 0.85:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(False, True, True, True, False, False, False, x, y)
+                                    print("three connections: bottom, left, right")
+                                else:
+                                    map_frame[y][x] = Room(False, False, True, True, False, False, False, x, y)
+                                    print("two connection: left, right (tried bottom)")
+                            else:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(False, True, True, False, False, False, False, x, y)
+                                    print("two connection: left, bottom (tried right)")
+                                else:
+                                    map_frame[y][x] = Room(False, False, True, False, False, False, False, x, y)
+                                    print("one connection: left (tried bottom, right)")
+            else:
+                if map_frame[y][x - 1].right == False:
+                    if map_frame[y][x + 1].left == False:
+                        if map_frame[y + 1][x].top == False:
+                            print("one connection: top")
+                            map_frame[y][x] = Room(True, False, False, False, False, False, False, x, y)
+                        else:
+                            ynb = 0.01 * float(random.randint(1, 100))
+                            if ynb <= 0.85:
+                                map_frame[y][x] = Room(True, True, False, False, False, False, False, x, y)
+                                print("two connection: top, bottom")
+                            else:
+                                map_frame[y][x] = Room(True, False, False, False, False, False, False, x, y)
+                                print("one connection: top (tried down)")
+                    else:
+                        ynr = 0.01 * float(random.randint(1, 100))
+                        if map_frame[y + 1][x].top == False:
+                            if ynr <= 0.85:
+                                map_frame[y][x] = Room(True, False, False, True, False, False, False, x, y)
+                                print("two connections: top, right")
+                            else:
+                                map_frame[y][x] = Room(True, False, False, False, False, False, False, x, y)
+                                print("one connection: top (tried right)")
+                        else:
+                            ynd = 0.01 * float(random.randint(1, 100))
+                            if ynr <= 0.85:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(True, True, False, True, False, False, False, x, y)
+                                    print("three connections: top, bottom, right")
+                                else:
+                                    map_frame[y][x] = Room(True, False, False, True, False, False, False, x, y)
+                                    print("two connections: top, right (tried bottom)")
+                            else:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(True, True, False, False, False, False, False, x, y)
+                                    print("two connections: top, bottom (tried right)")
+                                else:
+                                    map_frame[y][x] = Room(True, False, False, False, False, False, False, x, y)
+                                    print("one connection: top (tried bottom, right)")
+                else:
+                    if map_frame[y][x + 1].left == False:
+                        if map_frame[y + 1][x].top == False:
+                            map_frame[y][x] = Room(True, False, True, False, False, False, False, x, y)
+                            print("two connections: top, left")
+                        else:
+                            ynb = 0.01 * float(random.randint(1, 100))
+                            if ynb <= 0.85:
+                                map_frame[y][x] = Room(True, True, True, False, False, False, False, x, y)
+                                print("three connections: top, down, left")
+                            else:
+                                map_frame[y][x] = Room(True, False, True, False, False, False, False, x, y)
+                                print("two connections: top, left (tried down)")
+                    else:
+                        ynr = 0.01 * float(random.randint(1, 100))
+                        if map_frame[y + 1][x] == 1 or map_frame[y + 1][x].top == False:
+                            if ynr <= 0.85:
+                                map_frame[y][x] = Room(True, False, True, True, False, False, False, x, y)
+                                print("three connections: top, left, right")
+                            else:
+                                map_frame[y][x] = Room(True, False, True, False, False, False, False, x, y)
+                                print("two connections: top, left (tried right)")
+                        else:
+                            ynd = 0.01 * float(random.randint(1, 100))
+                            if ynr <= 0.85:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(True, True, True, True, False, False, False, x, y)
+                                    print("four connections: top, bottom, left, right")
+                                else:
+                                    map_frame[y][x] = Room(True, False, True, True, False, False, False, x, y)
+                                    print("three connection: top, left, right (tried bottom)")
+                            else:
+                                if ynd <= 0.85:
+                                    map_frame[y][x] = Room(True, True, True, False, False, False, False, x, y)
+                                    print("three connection: top, left, bottom (tried right)")
+                                else:
+                                    map_frame[y][x] = Room(True, False, True, False, False, False, False, x, y)
+                                    print("two connections: top, left (tried bottom, right)")
