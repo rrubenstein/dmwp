@@ -450,14 +450,8 @@ def draw_map(map_frame):
             time.sleep(0.01)
     return shapes
 
-c = make_map(a, b)
-d = draw_map(c)
-g = input("Got a pic yet? (y/n) ")
-if g == "y":
-    pass
-else:
-    pass
-def test_map(frame, shapes):
+
+def test_map(frame):
     set = False
     set_num = 0
     sets = {}
@@ -466,7 +460,6 @@ def test_map(frame, shapes):
             if frame[y][x].top == True or frame[y][x].bottom == True or frame[y][x].left == True or frame[y][x].right == True:
                 a = y
                 b = x
-                print("starting from: ", b, a)
                 set = True
                 set_num += 1
                 set_size = 0
@@ -488,16 +481,12 @@ def test_map(frame, shapes):
                             frame[a][b].top = False
                             frame[a - 1][b].bottom = False
                             fork_rooms.append(frame[a][b])
-                            print("Forking at {0} {1} and going Top".format(b, a))
                         else:
                             counted_rooms.append(frame[a][b])
                             frame[a][b] = frame_room
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
-                            print("Deleting {0} {1} and going Top".format(b, a))
-                            for q in shapes[a][b]:
-                                canvas.delete(q)
                         a -= 1
                     elif c['bottom'] == True and d['top'] == True:
                         #go down
@@ -505,16 +494,12 @@ def test_map(frame, shapes):
                             frame[a][b].bottom = False
                             frame[a + 1][b].top = False
                             fork_rooms.append(frame[a][b])
-                            print("Forking at {0} {1} and going Bottom".format(b, a))
                         else:
                             counted_rooms.append(frame[a][b])
                             frame[a][b] = frame_room
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
-                            print("Deleting {0} {1} and going Bottom".format(b, a))
-                            for q in shapes[a][b]:
-                                canvas.delete(q)
                         a += 1
                     elif c['left'] == True and l['right'] == True:
                         #go left
@@ -522,16 +507,12 @@ def test_map(frame, shapes):
                             frame[a][b].left = False
                             frame[a][b - 1].right = False
                             fork_rooms.append(frame[a][b])
-                            print("Forking at {0} {1} and going Left".format(b, a))
                         else:
                             counted_rooms.append(frame[a][b])
                             frame[a][b] = frame_room
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
-                            print("Deleting {0} {1} and going Left".format(b, a))
-                            for q in shapes[a][b]:
-                                canvas.delete(q)
                         b -= 1
                     elif c['right'] == True and r['left'] == True:
                         #go right
@@ -541,21 +522,15 @@ def test_map(frame, shapes):
                         frame[a][b].y = a
                         frame[a][b].x = b
                         set_size += 1
-                        print("Deleting {0} {1} and going Right".format(b, a))
-                        for q in shapes[a][b]:
-                            canvas.delete(q)
                         b += 1
                     else:
                         if len(fork_rooms) > 0:
                             #go back to last split and run while again
                             check = False
-                            print("Deleting {0} {1} and jumping back".format(b, a))
                             counted_rooms.append(frame[a][b])
                             frame[a][b] = frame_room
                             frame[a][b].y = a
                             frame[a][b].x = b
-                            for q in shapes[a][b]:
-                                canvas.delete(q)
                             while check == False and len(fork_rooms) > 0:
                                 z = fork_rooms.pop()
                                 a = z.y
@@ -563,7 +538,6 @@ def test_map(frame, shapes):
                                 for g in counted_rooms:
                                     if g.x == z.x and g.y == z.y:
                                         check = False
-                                        print("Fork at {0} {1} already counted".format(b, a))
                                         break
                                     else:
                                         check = True
@@ -571,40 +545,26 @@ def test_map(frame, shapes):
 
                             else:
                                 if check == True:
-                                    print("going back to fork at {0} {1}".format(b, a))
                                     set_size += 1
                                 elif len(fork_rooms) == 0:
-                                    print("Ending")
                                     set_size += 1
                                     sets["Set #{0}".format(set_num)] = set_size
                                     set = False
 
                         else:
-                            print("deleting {0} {1} and ending".format(b, a))
                             counted_rooms.append(frame[a][b])
                             frame[a][b] = frame_room
                             frame[a][b].y = a
                             frame[a][b].x = b
-                            for q in shapes[a][b]:
-                                canvas.delete(q)
                             set_size += 1
                             sets["Set #{0}".format(set_num)] = set_size
                             set = False
                             #end set
-                        tk.update()
-                        time.sleep(0.5)
-                if set_size > 2:
-                    print("How many times set == True ran: ", count)
-                    print("set number: ", set_num)
-                    print("set size: ", set_size)
-                    print("the origin room: ", origin_room)
-    for x in sets:
-        if sets[x] > 1:
-            print(x, sets[x])
+    return sets
 
-test_map(c, d)
-g = input("Quit? (y/n) ")
-if g == "y":
-    pass
-else:
-    pass
+def fin_map(max_x, max_y):
+    c = make_map(a, b)
+    d = draw_map(c)
+    sets = test_map(c)
+    largest_set = max(sets.values())
+    
