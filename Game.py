@@ -2,17 +2,18 @@ import time
 import random
 from tkinter import *
 import sys
+import copy
 
-a = int(input("How many rooms wide? "))
-b = int(input("How many rooms tall? "))
-x = a * 60 + 120
-y = b * 60 + 120
+a_map = int(input("How many rooms wide? "))
+b_map = int(input("How many rooms tall? "))
+x_map = a_map * 60 + 120
+y_map = b_map * 60 + 120
 tk = Tk()
 tk.title("Game")
 tk.resizable(0, 0)
 tk.wm_attributes("-topmost", 1)
 #each room will be 60 units so that is a ten by ten grid
-canvas = Canvas(tk, width=x, height=y)
+canvas = Canvas(tk, width=x_map, height=y_map)
 canvas.pack()
 tk.update()
 
@@ -301,21 +302,19 @@ rooms = Room(True, True, True, True, False, False, False, 0, 0)
 
 def make_array(max_x, max_y):
     array = []
-    for x in range(max_y + 2):
+    for y in range(max_y + 2):
         array.append([frame_room])
     for y in range(1, max_y + 1):
         for x in range(1, max_x + 1):
             array[y].append(rooms)
-    for x in range(max_y + 1):
-        array[x].append(frame_room)
+        array[y].append(frame_room)
     for x in range(max_x + 1):
-        array[len(array) - 1].append(frame_room)
-    for x in range(max_x):
         array[0].append(frame_room)
+        array[max_y + 1].append(frame_room)
     return array
 
-z = 0.67
 def make_map(max_x, max_y):
+    z = 0.67
     map_frame = make_array(max_x, max_y)
     for y in range(len(map_frame)):
         for x in range(len(map_frame[y])):
@@ -440,23 +439,22 @@ def make_map(max_x, max_y):
                                         map_frame[y][x] = Room(True, False, True, False, False, False, False, x, y)
     return map_frame
 def draw_map(map_frame):
-    a = len(map_frame) - 2
-    b = len(map_frame[0]) - 2
+    b = len(map_frame) - 2
+    a = len(map_frame[0]) - 2
     shapes = make_array(a, b)
     for y in range(len(map_frame)):
         for x in range(len(map_frame[y])):
             shapes[y][x] = map_frame[y][x].draw_room()
-            tk.update()
-            time.sleep(0.01)
     return shapes
 
 
-def test_map(frame):
+def test_map(map_frame):
+    frame = copy.deepcopy(map_frame)
     set = False
     set_num = 0
     sets = {}
-    for y in range(1, len(frame)):
-        for x in range(1, len(frame[0])):
+    for y in range(len(frame)):
+        for x in range(len(frame[y])):
             if frame[y][x].top == True or frame[y][x].bottom == True or frame[y][x].left == True or frame[y][x].right == True:
                 a = y
                 b = x
@@ -469,7 +467,6 @@ def test_map(frame):
                 count = 0
                 while set == True:
                     count += 1
-                    tk.update()
                     c = frame[a][b].test_direction()
                     t = frame[a - 1][b].test_direction()
                     d = frame[a + 1][b].test_direction()
@@ -483,7 +480,7 @@ def test_map(frame):
                             fork_rooms.append(frame[a][b])
                         else:
                             counted_rooms.append(frame[a][b])
-                            frame[a][b] = frame_room
+                            frame[a][b] = copy.deepcopy(frame_room)
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
@@ -496,7 +493,7 @@ def test_map(frame):
                             fork_rooms.append(frame[a][b])
                         else:
                             counted_rooms.append(frame[a][b])
-                            frame[a][b] = frame_room
+                            frame[a][b] = copy.deepcopy(frame_room)
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
@@ -509,7 +506,7 @@ def test_map(frame):
                             fork_rooms.append(frame[a][b])
                         else:
                             counted_rooms.append(frame[a][b])
-                            frame[a][b] = frame_room
+                            frame[a][b] = copy.deepcopy(frame_room)
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
@@ -518,7 +515,7 @@ def test_map(frame):
                         #go right
                         counted_rooms.append(frame[a][b])
                         frame[a][b + 1].left = False
-                        frame[a][b] = frame_room
+                        frame[a][b] = copy.deepcopy(frame_room)
                         frame[a][b].y = a
                         frame[a][b].x = b
                         set_size += 1
@@ -528,7 +525,7 @@ def test_map(frame):
                             #go back to last split and run while again
                             check = False
                             counted_rooms.append(frame[a][b])
-                            frame[a][b] = frame_room
+                            frame[a][b] = copy.deepcopy(frame_room)
                             frame[a][b].y = a
                             frame[a][b].x = b
                             while check == False and len(fork_rooms) > 0:
@@ -548,23 +545,69 @@ def test_map(frame):
                                     set_size += 1
                                 elif len(fork_rooms) == 0:
                                     set_size += 1
-                                    sets["Set #{0}".format(set_num)] = set_size
+                                    sets[set_num] = counted_rooms
                                     set = False
 
                         else:
                             counted_rooms.append(frame[a][b])
-                            frame[a][b] = frame_room
+                            frame[a][b] = copy.deepcopy(frame_room)
                             frame[a][b].y = a
                             frame[a][b].x = b
                             set_size += 1
-                            sets["Set #{0}".format(set_num)] = set_size
+                            sets[set_num] = counted_rooms
                             set = False
                             #end set
     return sets
 
 def fin_map(max_x, max_y):
-    c = make_map(a, b)
-    d = draw_map(c)
-    sets = test_map(c)
-    largest_set = max(sets.values())
-    
+    check = False
+    while check == False:
+        first_map = make_map(max_x, max_y)
+        sets = test_map(first_map)
+        if len(sets) > 1:
+            largest_set = 1
+            for x in sets:
+                if len(sets[x]) > len(sets[largest_set]):
+                    largest_set = x
+                else:
+                    continue
+        else:
+            largest_set = 1
+        largest_set = sets[largest_set]
+        if len(largest_set) < (max_x * max_y) - (max_x + max_y):
+            check = False
+        else:
+            check = True
+    else:
+        final_map = make_array(max_x, max_y)
+        for a in range(len(first_map)):
+            for b in range(len(first_map[a])):
+                for room in largest_set:
+                    if room.x == b and room.y == a:
+                        final_map[a][b] = copy.deepcopy(first_map[a][b])
+                        break
+                    else:
+                        continue
+        shapes = draw_map(final_map)
+        tk.update()
+        return shapes
+
+shapes = fin_map(a_map, b_map)
+input("Ready?")
+class Player(object):
+    def __init__(self, name, attack, defence, agilitly, hp_c, hp_m, level, xp_c, xp_m, gold, weapon, x, y, icon):
+        #14 attributes
+        self.name = name
+        self.attack = attack
+        self.defence = defence
+        self.agility = agility
+        self.hp_c = hp_c
+        self.hp_m = hp_m
+        self.level = level
+        self.xp_c = xp_c
+        self.xp_m = xp_m
+        self.gold = gold
+        self.weapon = weapon
+        self.x = x
+        self.y = y
+        self.icon = icon
